@@ -37,12 +37,19 @@ exports.getAllProducts = async (req, res, next) => {
 
 // GET /api/v1/products/productId/ - Get product by id
 exports.getProductById = async (req, res, next) => {
-  try {
-    return res.send("Get product by ID"); //scaffold return m meddelande
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
+  // try {
+  //   return res.send("Get product by ID"); //scaffold return m meddelande
+  // } catch (error) {
+  //   console.error(error);
+  //   return res.status(500).json({
+  //     message: error.message,
+  //   });
+  // }
+
+  const productId = req.params.restaurantId;
+
+  const product = await Product.findById(productId);
+
+  if (!product) throw new NotFoundError("This product does not exist");
+  return res.json(product);
 };

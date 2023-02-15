@@ -24,8 +24,11 @@ const {
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 const { notFoundMiddleware } = require("./middleware/notFoundMiddleware");
 
+/* ------- 1) CREATE EXPRESS APP / Skapa våran Express app ------- */
 const app = express();
 
+/* ------- 3) MIDDLEWARE / Sätt upp våran middleware ------- */
+// Parse JSON on request body and place on req.body
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -34,6 +37,7 @@ app.use((req, res, next) => {
   next();
 });
 
+/* ------- 4) ROUTES / Create our routes ------- */
 app.use("/helloWorld", (request, response) => {
   return response.send("Hello World!");
 });
@@ -53,9 +57,13 @@ app.get("/", createNewCartItem);
 app.get("/api/v1/cartitems/:cartitemId", updateCartItemById);
 app.get("/api/v1/cartitems/:cartitemId", deleteCartItemById);
 
-app.use(notFoundMiddleware);
-app.use(errorMiddleware);
+/*------- 5. ERROR HANDLING / Post route Middleware -------- */
+//här kan vi fånga upp alla request som inte anv routesen
 
+app.use(notFoundMiddleware); // Not found middleware
+app.use(errorMiddleware); // Error middleware (used to send uniform response in case of errors)
+
+/* ------- 2) SERVER SETUP / Start server ------- */
 const port = process.env.PORT || 4000;
 
 async function run() {
