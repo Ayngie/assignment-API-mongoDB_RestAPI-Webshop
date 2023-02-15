@@ -41,48 +41,81 @@ exports.getCartItemById = async (req, res, next) => {
 };
 
 // POST /api/v1/cartitems/ - Create new cartitem
-exports.createNewCartItem = async (req, res, next) => {
-  //args
-  const cartId = req.params.cartId;
-  const productId = req.params.productId;
+// exports.createNewCartItem = async (req, res, next) => {
+//   //args
+//   const cartId = req.params.cartId;
+//   const productId = req.params.productId;
 
-  const name = req.body.name;
-  const unitPrice = req.body.unitPrice;
-  const quantity = req.body.quantity;
+//   const name = req.body.name;
+//   const unitPrice = req.body.unitPrice;
+//   const quantity = req.body.quantity;
 
-  //check args / params input
-  if (!cartId) throw new BadRequestError("You must provide a cartId");
-  if (!productId) throw new BadRequestError("You must provide a productId");
+//   //check args / params input
+//   if (!cartId) throw new BadRequestError("You must provide a cartId");
+//   if (!productId) throw new BadRequestError("You must provide a productId");
 
-  //check so cart exists
-  const shoppingCartExists = await Cart.findById(cartId);
-  if (!shoppingCartExists)
-    throw new NotFoundError(
-      "Sorry, there's been a mistake - that shoppingcart does not exist."
-    );
+//   //check so cart exists
+//   const shoppingCartExists = await Cart.findById(cartId);
+//   if (!shoppingCartExists)
+//     throw new NotFoundError(
+//       "Sorry, there's been a mistake - that shoppingcart does not exist."
+//     );
 
-  //check so product exists
-  const productExists = await Product.findById(productId);
-  if (!productExists)
-    throw new NotFoundError(
-      "Sorry, there's been a mistake - that product does not exist."
-    );
+//   //check so product exists
+//   const productExists = await Product.findById(productId);
+//   if (!productExists)
+//     throw new NotFoundError(
+//       "Sorry, there's been a mistake - that product does not exist."
+//     );
 
-  const newCartItem = await CartItem.create({
-    name: name,
-    unitPrice: unitPrice,
-    quantity: quantity,
-  });
+//     //check cart for item
+//   let itemInCartExists = false;
+//   for (let cartItem of shoppingCartExists.cartItems) {
+//     if (cartItem.id === productId) {
+//       cartItem.quantity++;
+//       itemInCartExists = true;
+//     }
+//   }
 
-  return res
+//   if (!itemInCartExists) {
+//     const productFilePath = path.join(
+//       productsDirectory,
+//       `${productId}.json`
+//     );
 
-    .setHeader(
-      "Location",
-      `http://localhost:${process.env.PORT}/api/v1/cartItems/${newCartItem._id}`
-    )
-    .status(201)
-    .json(newCartItem);
-};
+//     const productExists = await fileExists(productFilePath);
+//     if (!productExists)
+//       return new GraphQLError(
+//         "Sorry, that product doesn't exist in our directory."
+//       );
+
+//     const productToAdd = await readJsonFile(productFilePath);
+
+//     const newCartItem = {
+//       id: productToAdd.id,
+//       name: productToAdd.name,
+//       unitPrice: productToAdd.unitPrice,
+//       quantity: 1,
+//     };
+
+//     shoppingCartToUpdate.itemsInCart.push(newCartItem);
+//   }
+
+//   const newCartItem = await CartItem.create({
+//     name: name,
+//     unitPrice: unitPrice,
+//     quantity: quantity,
+//   });
+
+//   return res
+
+//     .setHeader(
+//       "Location",
+//       `http://localhost:${process.env.PORT}/api/v1/cartItems/${newCartItem._id}`
+//     )
+//     .status(201)
+//     .json(newCartItem);
+// };
 
 // PUT /api/v1/cartitems/cartitemId/ - Update cartitem (by id)
 exports.updateCartItemById = async (req, res, next) => {
