@@ -2,78 +2,44 @@ require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
 const mongoose = require("mongoose");
-const {
-  getAllProducts,
-  getProductById,
-} = require("./controllers/productController");
-const {
-  getAllCarts,
-  getCartById,
-  createNewCart,
-  updateCartById,
-  deleteCartById,
-} = require("./controllers/cartController");
-const {
-  getAllCartItems,
-  getCartItemById,
-  createNewCartItem,
-  updateCartItemById,
-  deleteCartItemById,
-} = require("./controllers/cartItemController");
-
+const productRoutes = require("./routes/productRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 const { notFoundMiddleware } = require("./middleware/notFoundMiddleware");
 
-/* ------- 1) CREATE EXPRESS APP / Skapa våran Express app ------- */
+/* ------- CREATE EXPRESS APP ------- */
 const app = express();
 
-/* ------- 3) MIDDLEWARE / Sätt upp våran middleware ------- */
-// Parse JSON on request body and place on req.body
+/* ------- MIDDLEWARE ------- */
 app.use(express.json());
 
 app.use((req, res, next) => {
   console.log(`Processing ${req.method} request to ${req.path}`);
-  // when above code executed; go on to next middleware/routing
   next();
 });
 
-/* ------- 4) ROUTES / Create our routes ------- */
+/* ------- ROUTES ------- */
 app.use("/helloWorld", (request, response) => {
   return response.send("Hello World!");
 });
 
-app.get("/api/v1/products", getAllProducts);
-app.get("/api/v1/products/:productId", getProductById);
+app.get("/api/v1/products", productRoutes);
+app.get("/api/v1/carts", cartRoutes);
 
-app.get("/api/v1/carts", getAllCarts);
-app.get("/api/v1/carts/:cartId", getCartById);
-app.get("/", createNewCart);
-app.get("/api/v1/carts/:cartId", updateCartById);
-app.get("/api/v1/carts/:cartId", deleteCartById);
+/*------- ERROR HANDLING -------- */
 
-app.get("/api/v1/cartitems", getAllCartItems);
-app.get("/api/v1/cartitems/:cartitemId", getCartItemById);
-app.get("/", createNewCartItem);
-app.get("/api/v1/cartitems/:cartitemId", updateCartItemById);
-app.get("/api/v1/cartitems/:cartitemId", deleteCartItemById);
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
-/*------- 5. ERROR HANDLING / Post route Middleware -------- */
-//här kan vi fånga upp alla request som inte anv routesen
-
-app.use(notFoundMiddleware); // Not found middleware
-app.use(errorMiddleware); // Error middleware (used to send uniform response in case of errors)
-
-/* ------- 2) SERVER SETUP / Start server ------- */
+/* ------- SERVER SETUP ------- */
 const port = process.env.PORT || 4000;
 
 async function run() {
   try {
-    // Connect to MongoDB database (via Mongoose)
     mongoose.set("strictQuery", false);
     const conn = await mongoose.connect(process.env.MONGO_CONNECTION_STRING);
     console.log(`MongoDB connected: ${conn.connection.host}`);
 
-    // Start server; listen to requests on port
     app.listen(port, () => {
       console.log(`Server running on http://localhost:${port}`);
     });

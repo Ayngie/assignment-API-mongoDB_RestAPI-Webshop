@@ -1,36 +1,28 @@
 const mongoose = require("mongoose");
+const Product = require("./Product");
 
-//vi embeddar CartItemSchema i CartSchema
-//detta är ett subdocument
-const CartItemSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    unitPrice: {
-      type: String,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
-
-//parent document
 const CartSchema = new mongoose.Schema(
   {
-    cartItems: {
-      type: [CartItemSchema], //en array av subdocuments
-    },
-    totalSum: {
+    totalPrice: {
       type: Number,
       required: true,
+      default: 0,
+    },
+    cartItems: {
+      type: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+          },
+          quantity: {
+            type: Number,
+          },
+          totalItemPrice: {
+            type: Number,
+          },
+        },
+      ],
     },
   },
   {

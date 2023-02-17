@@ -10,11 +10,11 @@ const populateDbWithMockData = async (connectionString) => {
     mongoose.set("strictQuery", false);
 
     const conn = await mongoose.connect(connectionString);
-
     console.log(`MongoDB connected: ${conn.connection.host}`);
 
-    await Product.create(ProductMockData.products);
+    await Product.deleteMany();
 
+    await Product.create(ProductMockData.products);
     console.log("Database successfully populated with test data");
   } catch (error) {
     console.error(error);
