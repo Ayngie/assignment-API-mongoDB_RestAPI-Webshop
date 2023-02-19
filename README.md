@@ -1,3 +1,7 @@
+# assignment-API-mongoDB_RestAPI-Webshop
+
+Andra individuella inlämningsuppgiften i API-utvecklingskursen, Medieinstitutet (termin 2), Stockholm
+
 # Routes
 
 ## Webshop API routes are as follows:
