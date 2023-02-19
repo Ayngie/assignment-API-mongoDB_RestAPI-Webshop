@@ -38,5 +38,5 @@ Delete with productId as follows:
 
 Delete with cartId as follows:
 {
-"cartId": "63f255e80f65e261cf18ba2a"
+"cartId": ""
 }
