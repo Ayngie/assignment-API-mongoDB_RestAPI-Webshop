@@ -22,21 +22,21 @@ Andra individuella inlämningsuppgiften i API-utvecklingskursen, Medieinstitutet
 
 ##### PUT /api/v1/carts/cartId - add Item To Cart
 
-Add with productId as follows:
+_Add with productId as follows:_
 `{
 "pId": ""
 }`
 
 ##### DELETE /api/v1/carts/cartId/productId - delete Item From Cart
 
-Delete with productId as follows:
+_Delete with productId as follows:_
 `{
 "pId": ""
 }`
 
 ##### DELETE /api/v1/carts/cartId - Delete cart (by id)
 
-Delete with cartId as follows:
+_Delete with cartId as follows:_
 `{
 "cartId": ""
 }`
