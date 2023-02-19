@@ -8,7 +8,9 @@ const { products } = require("../../seedDb/products");
 exports.getAllCarts = async (req, res, next) => {
   const carts = await Cart.find();
   if (carts.length === 0)
-    throw new NotFoundError("Sorry, no shopping carts exist!");
+    throw new NotFoundError(
+      "Sorry, there is nothing to show - no carts exist!"
+    );
 
   const totalCartsInDatabase = await Cart.countDocuments();
 
@@ -29,9 +31,7 @@ exports.getCartById = async (req, res, next) => {
   const cart = await Cart.findById(cartId).populate("cartItems.product");
 
   if (!cart)
-    throw new NotFoundError(
-      "Sorry, that shoppingcart does not exist! Try again :)"
-    );
+    throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
   return res.json(cart);
 };
 
@@ -58,7 +58,7 @@ exports.addItemToCart = async (req, res, next) => {
   const cart = await Cart.findById(cartId);
 
   if (!cart)
-    throw new NotFoundError("Sorry, the cart does not exist, try again.");
+    throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
 
   const cartItems = cart.cartItems;
 
@@ -94,36 +94,41 @@ exports.addItemToCart = async (req, res, next) => {
 
 exports.deleteItemFromCart = async (req, res, next) => {
   const cartId = req.params.cartId;
-  const productId = req.params.productId;
-  if (productId.length != 24 || cartId.length != 24) {
-    return res.status(400).send("Id must be a string of 24 characters");
+  const pId = req.body.pId;
+  let quantityToRemove = req.body.quantity || 1;
+  const cart = await Cart.findById(cartId);
+  if (!cart)
+    throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
+
+  let cartItems = cart.cartItems;
+  await cart.populate("cartItems.product");
+
+  const productIndex = cartItems.findIndex(
+    (product) => product.product._id == pId
+  );
+
+  if (productIndex < 0)
+    throw new BadRequestError("Nothing to remove, the cart is already empty!");
+
+  if (cartItems[productIndex].quantity > quantityToRemove) {
+    cartItems[productIndex].quantity -= quantityToRemove;
+
+    let totalPrice = cart.totalPrice || 0;
+
+    cartItems.forEach((product) => {
+      if (product.product._id == pId) {
+        totalPrice -= product.product.unitPrice * quantityToRemove;
+      }
+    });
+    cart.totalPrice = totalPrice;
+  } else {
+    cart.totalPrice -= cartItems[productIndex].product.unitPrice;
+    cartItems.splice(productIndex, 1);
   }
 
-  try {
-    let cartToUpdate = await Cart.findById(cartId);
-
-    const productInCart = cartToUpdate.cartItems.find(
-      ({ product }) => product == productId
-    );
-
-    let listindex = cartToUpdate.cartItems.indexOf(productInCart);
-    cartToUpdate.cartItems.splice(listindex, 1);
-
-    let sum = 0;
-
-    for (let x of cartToUpdate.cartItems) {
-      sum += x.totalItemPrice;
-    }
-
-    cartToUpdate.totalprice = sum;
-
-    const updatedCart = await cartToUpdate.save();
-
-    return res.json(updatedCart);
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(500);
-  }
+  await cart.save();
+  const cartRes = await cart.populate("cartItems.product");
+  return res.json(cartRes);
 };
 
 /* --------------------------- DELETE /api/v1/carts/cartId - Delete cart (by id) --------------------------- */
