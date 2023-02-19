@@ -37,6 +37,6 @@ Delete with productId as follows:
 ##### DELETE /api/v1/carts/cartId - Delete cart (by id)
 
 Delete with cartId as follows:
-{
+`{
 "cartId": ""
-}
+}`
