@@ -52,70 +52,42 @@ exports.createNewCart = async (req, res, next) => {
 /* --------------------------- PUT /api/v1/carts/cartId - add Item To Cart --------------------------- */
 
 exports.addItemToCart = async (req, res, next) => {
-  const { productId } = req.body;
-  const quantity = Number.parseInt(req.body.quantity);
   const cartId = req.params.cartId;
-  if (productId.length != 24 || cartId.length != 24) {
-    return res.status(400).send("ID must be a string of 24  hex characters");
+  const pId = req.body.pId;
+  let quantityToAdd = req.body.quantity || 1;
+  const cart = await Cart.findById(cartId);
+
+  if (!cart)
+    throw new NotFoundError("Sorry, the cart does not exist, try again.");
+
+  const cartItems = cart.cartItems;
+
+  const existingProductIndex = cartItems.findIndex(
+    (product) => product.product == pId
+  );
+
+  if (existingProductIndex > -1) {
+    cartItems[existingProductIndex].quantity += quantityToAdd;
+  } else {
+    cartItems.push({
+      product: pId,
+      quantity: quantityToAdd,
+    });
   }
 
-  try {
-    if (!productId && quantity) {
-      return res.status(400).json({
-        message: "You must provide a productID and quantity to update",
-      });
+  await cart.populate("cartItems.product");
+
+  let totalPrice = cart.totalPrice || 0;
+  cartItems.forEach((product) => {
+    if (product.product._id == pId) {
+      totalPrice += product.product.unitPrice * quantityToAdd;
     }
+  });
+  cart.totalPrice = totalPrice;
 
-    let cartToUpdate = await Cart.findById(cartId);
+  await cart.save();
 
-    let productDetails = await Product.findById(productId);
-
-    if (!productDetails) {
-      return res.status(400).send("That product does not exist");
-    }
-
-    if (!cartToUpdate) return res.status(400).send("That cart does not exist");
-
-    const productInCart = cartToUpdate.cartItems.find(
-      ({ product }) => product == productId
-    );
-
-    if (productInCart) {
-      productInCart.quantity += quantity;
-      productInCart.totalItemPrice +=
-        productDetails.unitPrice * productInCart.quantity;
-      console.log(productInCart.product.unitPrice);
-      if (productInCart.quantity <= 0) {
-        let listindex = cartToUpdate.cartItems.indexOf(productInCart);
-        cartToUpdate.cartItems.splice(listindex, 1);
-      }
-    }
-
-    if (!productInCart && quantity > 0) {
-      const newCartItem = {
-        product: productId,
-        quantity: quantity,
-        totalItemPrice: Number(productDetails.unitPrice * quantity),
-      };
-      cartToUpdate.cartItems.push(newCartItem);
-    }
-
-    let sum = 0;
-
-    for (let x of cartToUpdate.cartItems) {
-      sum += x.totalItemPrice;
-    }
-
-    cartToUpdate.totalprice = sum;
-
-    const updatedCart = await cartToUpdate.save();
-
-    return res.json(updatedCart);
-  } catch (error) {
-    console.error(error);
-
-    return res.sendStatus(500);
-  }
+  return res.json(cart);
 };
 
 /* --------------------------- PUT /api/v1/carts/cartId/productId - delete Item From Cart --------------------------- */
@@ -157,10 +129,7 @@ exports.deleteItemFromCart = async (req, res, next) => {
 /* --------------------------- DELETE /api/v1/carts/cartId - Delete cart (by id) --------------------------- */
 
 exports.deleteCartById = async (req, res, next) => {
-  const cartId = req.params.cartId;
-  if (cartId.length != 24) {
-    return res.status(400).send("Id must be a string of 24 hex characters");
-  }
+  const cartId = req.body.cartId;
 
   const cartToDelete = await Cart.findById(cartId);
 

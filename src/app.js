@@ -23,8 +23,8 @@ app.use("/helloWorld", (request, response) => {
   return response.send("Hello World!");
 });
 
-app.get("/api/v1/products", productRoutes);
-app.get("/api/v1/carts", cartRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/carts", cartRoutes);
 
 /*------- ERROR HANDLING -------- */
 
