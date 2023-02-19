@@ -108,7 +108,9 @@ exports.deleteItemFromCart = async (req, res, next) => {
   );
 
   if (productIndex < 0)
-    throw new BadRequestError("Nothing to remove, the cart is already empty!");
+    throw new BadRequestError(
+      "Sorry, that product does not exist in this cart. Try again!"
+    );
 
   if (cartItems[productIndex].quantity > quantityToRemove) {
     cartItems[productIndex].quantity -= quantityToRemove;
@@ -138,7 +140,8 @@ exports.deleteCartById = async (req, res, next) => {
 
   const cartToDelete = await Cart.findById(cartId);
 
-  if (!cartToDelete) throw new NotFoundError("This cart does not exist");
+  if (!cartToDelete)
+    throw new NotFoundError("Sorry, this cart does not exist. Try again!");
   await cartToDelete.delete();
   return res.sendStatus(204);
 };
