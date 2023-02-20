@@ -30,6 +30,12 @@ exports.getCartById = async (req, res, next) => {
 
   const cart = await Cart.findById(cartId).populate("cartItems.product");
 
+  if (cartId.length != 24) {
+    return res
+      .status(400)
+      .send("Cart ID must be a string of 24 hex characters");
+  }
+
   if (!cart)
     throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
   return res.json(cart);
@@ -56,6 +62,18 @@ exports.addItemToCart = async (req, res, next) => {
   const pId = req.body.pId;
   let quantityToAdd = req.body.quantity || 1;
   const cart = await Cart.findById(cartId);
+
+  if (cartId.length != 24) {
+    return res
+      .status(400)
+      .send("Cart ID must be a string of 24 hex characters");
+  }
+
+  if (pId.length != 24) {
+    return res
+      .status(400)
+      .send("Product ID must be a string of 24 hex characters");
+  }
 
   if (!cart)
     throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
@@ -97,6 +115,19 @@ exports.deleteItemFromCart = async (req, res, next) => {
   const pId = req.body.pId;
   let quantityToRemove = req.body.quantity || 1;
   const cart = await Cart.findById(cartId);
+
+  if (cartId.length != 24) {
+    return res
+      .status(400)
+      .send("Cart ID must be a string of 24 hex characters");
+  }
+
+  if (pId.length != 24) {
+    return res
+      .status(400)
+      .send("Product ID must be a string of 24 hex characters");
+  }
+
   if (!cart)
     throw new NotFoundError("Sorry, that cart does not exist! Try again :)");
 
