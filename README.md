@@ -1,16 +1,21 @@
 # assignment-API-mongoDB_RestAPI-Webshop
 
-Andra individuella inlämningsuppgiften i API-utvecklingskursen, Medieinstitutet (termin 2), Stockholm
+## Description:
+My second individual assignment in API-development course.
+Frontend developer studies, Medieinstitutet, Stockholm.
 
-# Routes
+---
 
-## Webshop API routes are as follows:
+## Routes
+Webshop API routes are as follows:
+
 
 ### Product Routes
 
 ##### GET /api/v1/products - Get all products
 
 ##### GET /api/v1/products/productId - Get product by id
+
 
 ### Cart Routes
 
@@ -40,3 +45,8 @@ _Delete with cartId as follows:_
 `{
 "cartId": ""
 }`
+
+---
+
+## Screenshot from project:
+![Demonstration of project](https://angelicareutersward.se/Images/mongoDbWebshop/MongoDbWebshop.png?raw=true "MongoDb Webshop")
