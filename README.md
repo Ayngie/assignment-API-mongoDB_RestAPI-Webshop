@@ -1,4 +1,4 @@
-# assignment-API-mongoDB_RestAPI-Webshop
+# MongoDb Webshop
 
 ## Short description:
 My second individual assignment in my API-development course was creating a MongoDb (+ mongoose) REST-API for a webshops products & shoppingcarts.
